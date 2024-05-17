@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, Partials, EmbedBuilder, PermissionsBitField, MessageActionRow, MessageButton } = require('discord.js');
+const { Client, GatewayIntentBits, Partials, EmbedBuilder, PermissionsBitField, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 const client = new Client({ 
   intents: [
@@ -60,7 +60,7 @@ client.on('messageCreate', async message => {
     const emojiName = args[0].split(':')[1];
     const emojiId = args[0].split(':')[2].slice(0, -1);
     
-    message.guild.emojis.create(`https://cdn.discordapp.com/emojis/${emojiId}.png`, emojiName)
+    message.guild.emojis.create({ attachment: `https://cdn.discordapp.com/emojis/${emojiId}.png`, name: emojiName })
       .then(emoji => message.channel.send(`Emoji ${emoji} créé avec succès!`))
       .catch(error => {
         console.error('Erreur lors de la création de l\'emoji:', error);
@@ -155,8 +155,7 @@ client.on('messageCreate', async message => {
   }
 
   if (command === 'unmute') {
-    if (!message.member.permissions.has(
-PermissionsBitField.Flags.MuteMembers)) {
+    if (!message.member.permissions.has(PermissionsBitField.Flags.MuteMembers)) {
       return message.channel.send('Vous n\'avez pas les permissions pour unmute les membres.');
     }
     const user = message.mentions.members.first();
@@ -215,9 +214,9 @@ PermissionsBitField.Flags.MuteMembers)) {
           name: 'Modérateur',
           color: 'BLUE',
           permissions: [
-            'VIEW_CHANNEL',
-            'MANAGE_CHANNELS',
-            'MANAGE_MESSAGES'
+            PermissionsBitField.Flags.ViewChannel,
+            PermissionsBitField.Flags.ManageChannels,
+            PermissionsBitField.Flags.ManageMessages
           ]
         });
         message.channel.send('Rôle Modérateur créé avec succès.');
@@ -228,12 +227,12 @@ PermissionsBitField.Flags.MuteMembers)) {
         .setDescription('Créez un ticket ci-dessous pour contacter le support. Si vous créez un ticket, c\'est parce qu\'il y a un problème, ou pour réclamer un giveaway, etc.')
         .setColor('#00FF00');
 
-      const row = new MessageActionRow()
+      const row = new ActionRowBuilder()
         .addComponents(
-          new MessageButton()
+          new ButtonBuilder()
             .setCustomId('create_ticket')
             .setLabel('Créer un ticket')
-            .setStyle('PRIMARY')
+            .setStyle(ButtonStyle.Primary)
         );
 
       message.channel.send({ embeds: [ticketEmbed], components: [row] });
